@@ -19,20 +19,40 @@
             align-items: center;
             height: 80vh;
         }
-        .num{  
-            font-family: "DotGothic16", sans-serif;
-            font-weight: 700;
+			.countdown{
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: 0.2em;
+				min-height: 60vh;
+				padding: 1rem 0.5rem;
+			}
+			/* responsive size: between 64px and 220px depending on viewport */
+			:root{--countdown-size: clamp(64px, 18vw, 220px)}
+			.num{
+				font-family: "DotGothic16", sans-serif;
+				font-size: var(--countdown-size);
+				line-height: 1;
+				white-space: nowrap;
         }
-        .label{
-            font-family: "Silkscreen", sans-serif;
-            font-weight: 400;
+			.label{
+				font-family: "Silkscreen", sans-serif;
+				font-size: calc(var(--countdown-size) * 0.75);
+				line-height: 1;
+				padding: 0 0.08em;
         }
 	</style>
 </head>
 <body>
 	<div class="wrap">
 		<div class="card">
-			<h1>あけましておめでとう</h1>
+			<h1 id="title">新年まであと</h1>
+			<div id="countdown" class="countdown" aria-live="polite">
+				<div id="hours" class="num">00</div><div class="label">:</div>
+				<div id="minutes" class="num">00</div><div class="label">:</div>
+				<div id="seconds" class="num">00</div><div class="label"></div>
+			</div> 
 
 			<div id="message" style="text-align:center; font-size:36px; margin-top:10px;"></div>
 			</div>
@@ -49,16 +69,36 @@
 
 		function update(){
 			const now = new Date();
-			const target = getNextNewYear(now);
-			const diff = target - now;
+			const title = document.getElementById('title');
 
-			if(diff <= 0){
+			// If it's already New Year's Day (anytime on Jan 1), show greeting immediately
+			if(now.getMonth() === 0 && now.getDate() === 1){
+				if(title) title.style.display = 'none';
 				document.getElementById('countdown').style.display = 'none';
 				const msg = document.getElementById('message');
 				msg.textContent = 'あけましておめでとうございます！';
 				launchConfetti();
 				clearInterval(timer);
 				return;
+			}
+
+			const target = getNextNewYear(now);
+			const diff = target - now;
+
+			if(diff <= 0){
+				if(title) title.style.display = 'none';
+				document.getElementById('countdown').style.display = 'none';
+				const msg = document.getElementById('message');
+				msg.textContent = 'あけましておめでとうございます！';
+				launchConfetti();
+				clearInterval(timer);
+				return;
+			}
+
+			// Normal countdown state: ensure title is visible
+			if(title){
+				title.style.display = '';
+				title.textContent = '新年まであと';
 			}
 
 			const sec = Math.floor(diff / 1000) % 60;
@@ -95,8 +135,8 @@
 			}
 		}
 
-		update();
 		const timer = setInterval(update, 1000);
+		update();
 	</script>
 </body>
 </html>
