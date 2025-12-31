@@ -17,15 +17,30 @@
             justify-content: center;
             font-size: 220px;
             align-items: center;
-            height: 80vh; 
+            height: 80vh;
         }
-        .num{  
-            font-family: "DotGothic16", sans-serif;
-            font-weight: 700;
+			.countdown{
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: 0.2em;
+				min-height: 60vh;
+				padding: 1rem 0.5rem;
+			}
+			/* responsive size: between 64px and 220px depending on viewport */
+			:root{--countdown-size: clamp(64px, 18vw, 220px)}
+			.num{
+				font-family: "DotGothic16", sans-serif;
+				font-size: var(--countdown-size);
+				line-height: 1;
+				white-space: nowrap;
         }
-        .label{
-            font-family: "Silkscreen", sans-serif;
-            font-weight: 400;
+			.label{
+				font-family: "Silkscreen", sans-serif;
+				font-size: calc(var(--countdown-size) * 0.75);
+				line-height: 1;
+				padding: 0 0.08em;
         }
 	</style>
 </head>
