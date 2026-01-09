@@ -49,6 +49,7 @@
 		<div class="card">
 			<h1 id="title">新年まであと</h1>
 			<div id="countdown" class="countdown" aria-live="polite">
+				<div id="days" class="num">0</div><div class="label">:</div>
 				<div id="hours" class="num">00</div><div class="label">:</div>
 				<div id="minutes" class="num">00</div><div class="label">:</div>
 				<div id="seconds" class="num">00</div><div class="label"></div>
@@ -106,6 +107,7 @@
 			const hrs = Math.floor(diff / (1000*60*60)) % 24;
 			const days = Math.floor(diff / (1000*60*60*24));
 
+			document.getElementById('days').textContent = days;
 			document.getElementById('hours').textContent = pad(hrs);
 			document.getElementById('minutes').textContent = pad(min);
 			document.getElementById('seconds').textContent = pad(sec);
