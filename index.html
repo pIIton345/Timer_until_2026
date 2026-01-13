@@ -12,29 +12,30 @@
         h1{
             text-align: center;
         }
-        .countdown{
-            display: flex;
-            justify-content: center;
-            font-size: 220px;
-            align-items: center;
-            height: 80vh;
-        }
 			.countdown{
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				flex-wrap: wrap;
+				flex-wrap: nowrap;
 				gap: 0.2em;
 				min-height: 60vh;
 				padding: 1rem 0.5rem;
+				  max-width: 100vw;
+				  overflow: hidden;
+				  white-space: nowrap;
+				
 			}
-			/* responsive size: between 64px and 220px depending on viewport */
-			:root{--countdown-size: clamp(64px, 18vw, 220px)}
+			/* countdown sizing variables: min/max and current size (JS will adjust) */
+			:root{--countdown-min: 16px; --countdown-max: 220px; --countdown-size: 220px}
 			.num{
 				font-family: "DotGothic16", sans-serif;
 				font-size: var(--countdown-size);
 				line-height: 1;
 				white-space: nowrap;
+        }
+		#title{
+				font-family: "DotGothic16", sans-serif;
+				
         }
 			.label{
 				font-family: "Silkscreen", sans-serif;
@@ -111,6 +112,7 @@
 			document.getElementById('hours').textContent = pad(hrs);
 			document.getElementById('minutes').textContent = pad(min);
 			document.getElementById('seconds').textContent = pad(sec);
+			if(typeof fitCountdown === 'function') fitCountdown();
 		}
 
 		// simple confetti (no external libs)
@@ -136,6 +138,45 @@
 				setTimeout(()=>{ el.remove(); }, fall + 500);
 			}
 		}
+
+			// High-precision autosize: set --countdown-size so the whole content fits exactly
+			function fitCountdown(){
+				const container = document.getElementById('countdown');
+				if(!container) return;
+
+				const paddingAllowance = 4; // px
+				const available = Math.max(0, container.clientWidth - paddingAllowance);
+
+				const cs = getComputedStyle(document.documentElement);
+				const min = parseFloat(cs.getPropertyValue('--countdown-min')) || 16;
+				const max = parseFloat(cs.getPropertyValue('--countdown-max')) || 220;
+
+				// measure sum of children widths
+				const measure = () => {
+					let tot = 0;
+					for(const el of container.children){
+						const r = el.getBoundingClientRect();
+						tot += r.width;
+					}
+					return tot;
+				};
+
+				let lo = min, hi = max, best = min;
+				while(hi - lo > 0.2){
+					const mid = (lo + hi) / 2;
+					container.style.setProperty('--countdown-size', mid + 'px');
+					const need = measure();
+					if(need <= available){ best = mid; lo = mid; }
+					else { hi = mid; }
+				}
+
+				best = Math.max(min, Math.min(max, best));
+				container.style.setProperty('--countdown-size', best.toFixed(1) + 'px');
+			}
+
+			let fitRaf = null;
+			window.addEventListener('resize', ()=>{ if(fitRaf) cancelAnimationFrame(fitRaf); fitRaf = requestAnimationFrame(()=>{ fitCountdown(); fitRaf = null; }); });
+
 
 		const timer = setInterval(update, 1000);
 		update();
